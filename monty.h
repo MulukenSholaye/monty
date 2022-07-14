@@ -1,32 +1,11 @@
-#ifndef MONTY_H
-#define MONTY_H
+#ifndef _MONTY_H_
+#define _MONTY_H_
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <stdbool.h>
 #include <ctype.h>
-#include <fcntl.h>
-
-/**monty errors defined*/
-#define MONTY_ERROR_NONE 0
-#define MONTY_ERROR_INVALID_OPCODE 1
-#define MONTY_ERROR_PUSH_MISSING_ARG 2
-#define MONTY_ERROR_PUSH_INVALID_ARG 3
-#define MONTY_ERROR_PINT_EMPTY 4
-#define MONTY_ERROR_POP_EMPTY 5
-
-
-typedef struct monty_s{
-  char  *save_ptr;
-  int line;
-  char *token;
-  int mode;
-  int error;
-}monty_t;
-
-extern char* operand;
-
+#include <unistd.h>
 /**
  * struct stack_s - doubly linked list representation of a stack (or queue)
  * @n: integer
@@ -57,33 +36,40 @@ typedef struct instruction_s
 	void (*f)(stack_t **stack, unsigned int line_number);
 } instruction_t;
 
+extern char stack_queue;
+
+void _add(stack_t **stack, unsigned int line_number);
+void _div(stack_t **stack, unsigned int line_number);
+void _mod(stack_t **stack, unsigned int line_number);
+void _mul(stack_t **stack, unsigned int line_number);
+void _nop(stack_t **stack, unsigned int line_number);
+void _pall(stack_t **stack, unsigned int line_number);
+void _pint(stack_t **stack, unsigned int line_number);
+void _pop(stack_t **stack, unsigned int line_number);
+void _push(stack_t **stack, unsigned int line_number);
+void _sub(stack_t **stack, unsigned int line_number);
+void _swap(stack_t **stack, unsigned int line_number);
+
+void _pchar(stack_t **stack, unsigned int line_number);
+void _pstr(stack_t **stack, unsigned int line_number);
+void _rotr(stack_t **stack, unsigned int line_number);
+void _rotl(stack_t **stack, unsigned int line_number);
+
+void _stack(stack_t **stack, unsigned int line_number);
+void _queue(stack_t **stack, unsigned int line_number);
+
 /**
- * struct line_s - line content and its number
- * @content: line content
- * @number: line number 
+ * get_opcode - reads opcode and verifies if is valid.
+ * @stack: double pointer to header (top) of the stack.
+ * @line_number: counter for line number of the file.
+ * @code: code to operate.
  *
- * Description: stores line of the monty source code
+ * Return: void.
  */
-typedef struct line_s
-{
-	char *content;
-	int number;
-} line_t;
+void get_opcode(stack_t **stack, unsigned int line_number, char *code);
+char **token_opcode(char *line);
+void free_stack_t(stack_t *head);
+void add_node(stack_t **stack, int argument);
+void add_node_queue(stack_t **stack, int argument);
 
-line_t *textfile_to_array(const char *filename);
-void op_push(stack_t **stack, unsigned int line_number);
-void op_pall(stack_t **stack, unsigned int line_number);
-void op_pint(stack_t **stack, unsigned int line_number);
-void op_pop(stack_t **stack, unsigned int line_number);
-void op_swap(stack_t **stack, unsigned int line_number);
-
-char **split_line(char *line);
-void (*get_op_func(char *s))(stack_t**, unsigned int);
-
-
-void free_lines(line_t *head);
-void free_stack(stack_t *head);
-int _atoi(char *s, int* n);
-
-#endif
-
+#endif /*_MONTY_H_ */
