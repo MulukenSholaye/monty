@@ -5,7 +5,7 @@
  * @head: top of the stack
  * @line_number: line number where a wrong command was found
  * Return: void
- * author Anteneh Bizuneh for Alx project
+ * author Muluken Sholaye
  */
 void _mul(stack_t **head, unsigned int line_number)
 {
