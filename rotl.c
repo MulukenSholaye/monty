@@ -1,29 +1,26 @@
 #include "monty.h"
-
 /**
- * _rotl - rotates the stack to the top.
- * @stack: double pointer to header (top) of the stack.
- * @line_number: counter for line number of the file.
- *
- * Return: void.
+  *f_rotl- rotates the stack to the top
+  *@head: stack head
+  *@counter: line_number
+  *Return: no return
  */
-void _rotl(stack_t **stack, unsigned int line_number)
+void f_rotl(stack_t **head,  __attribute__((unused)) unsigned int counter)
 {
-	stack_t *temp, *last;
+	stack_t *tmp = *head, *aux;
 
-	(void) line_number;
-	if (*stack == NULL || (*stack)->next == NULL)
+	if (*head == NULL || (*head)->next == NULL)
+	{
 		return;
-
-	last = *stack;
-	while (last->next != NULL)
-		last = last->next;
-
-	temp = *stack;
-	*stack = (*stack)->next;
-	(*stack)->prev = NULL;
-	temp->next = NULL;
-	temp->prev = last;
-	last->next = temp;
-
+	}
+	aux = (*head)->next;
+	aux->prev = NULL;
+	while (tmp->next != NULL)
+	{
+		tmp = tmp->next;
+	}
+	tmp->next = *head;
+	(*head)->next = NULL;
+	(*head)->prev = tmp;
+	(*head) = aux;
 }
