@@ -1,29 +1,42 @@
 #include "monty.h"
-/**
-  *f_sub- sustration
-  *@head: stack head
-  *@counter: line_number
-  *Return: no return
- */
-void f_sub(stack_t **head, unsigned int counter)
-{
-	stack_t *aux;
-	int sus, nodes;
 
-	aux = *head;
-	for (nodes = 0; aux != NULL; nodes++)
-		aux = aux->next;
-	if (nodes < 2)
+/**
+ * _sub -  subtracts top element of the stack from the second top element.
+ * @head: double pointer to header (top) of the stack.
+ * @line_number: counter for line number of the file.
+ * author Anteneh Bizuneh
+ * Return: void.
+ */
+void _sub(stack_t **head, unsigned int line_number)
+{
+	stack_t *current = *head;
+	int nnodes = 1; /*number of elements in stack*/
+
+	if (*head == NULL)
 	{
-		fprintf(stderr, "L%d: can't sub, stack too short\n", counter);
-		fclose(bus.file);
-		free(bus.content);
-		free_stack(*head);
+		fprintf(stderr, "L%u: can't sub, stack too short\n", line_number);
+		free_stack_t(*head);
+
 		exit(EXIT_FAILURE);
 	}
-	aux = *head;
-	sus = aux->next->n - aux->n;
-	aux->next->n = sus;
-	*head = aux->next;
-	free(aux);
+
+	while (current->next != NULL)
+	{
+		current = current->next;
+		nnodes++;
+	}
+
+	if (nnodes + 1 <= 2)
+	{
+		fprintf(stderr, "L%u: can't sub, stack too short\n", line_number);
+		exit(EXIT_FAILURE);
+	}
+
+	current = *head; /*current equals to head to make substraction*/
+
+	current->next->n = current->next->n - current->n; /*do the substraction*/
+
+	*head = current->next;
+	free(current);
+	current->prev = NULL;
 }

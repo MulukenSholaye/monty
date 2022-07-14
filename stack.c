@@ -1,13 +1,15 @@
 #include "monty.h"
+
 /**
- * f_stack - prints the top
- * @head: stack head
- * @counter: line_number
- * Return: no return
-*/
-void f_stack(stack_t **head, unsigned int counter)
+ * _stack - select stack mode (default).
+ * @stack: double pointer to header (top) of the stack.
+ * @line_number: counter for line number of the file.
+ *
+ * Return: void.
+ */
+void _stack(stack_t **stack, unsigned int line_number)
 {
-	(void)head;
-	(void)counter;
-	bus.lifi = 0;
+	(void) stack;
+	(void) line_number;
+	stack_queue = 's';
 }

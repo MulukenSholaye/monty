@@ -1,19 +1,23 @@
 #include "monty.h"
+
 /**
- * f_pint - prints the top
- * @head: stack head
- * @counter: line_number
- * Return: no return
-*/
-void f_pint(stack_t **head, unsigned int counter)
+ * _pint - prints the value at the top of the stack
+ * @stack: double pointer to header (top) of the stack.
+ * @line_number: counter for line number of the file.
+ * author Anteneh Bizuneh for ALX project
+ * Return: void.
+ */
+void _pint(stack_t **stack, unsigned int line_number)
 {
-	if (*head == NULL)
+	stack_t *current = *stack;
+
+	if (*stack == NULL)
 	{
-		fprintf(stderr, "L%u: can't pint, stack empty\n", counter);
-		fclose(bus.file);
-		free(bus.content);
-		free_stack(*head);
+		dprintf(STDERR_FILENO, "L%d: can't pint, stack empty\n", line_number);
+		free_stack_t(*stack);
+
 		exit(EXIT_FAILURE);
 	}
-	printf("%d\n", (*head)->n);
+
+	printf("%d\n", current->n);
 }

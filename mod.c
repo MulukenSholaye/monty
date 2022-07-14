@@ -1,41 +1,50 @@
 #include "monty.h"
-/**
- * f_mod - computes the rest of the division of the second
- * top element of the stack by the top element of the stack
- * @head: stack head
- * @counter: line_number
- * Return: no return
-*/
-void f_mod(stack_t **head, unsigned int counter)
-{
-	stack_t *h;
-	int len = 0, aux;
 
-	h = *head;
-	while (h)
+/**
+ * _mod - get the module of the second top element of the stack and top element
+ * @head: double pointer to header (top) of the stack.
+ * @line_number: counter for line number of the file.
+ * author Anteneh kassaw Bizuneh for Alx project
+ * Return: void.
+ */
+void _mod(stack_t **head, unsigned int line_number)
+{
+	stack_t *current = *head;
+	int nnodes = 1; /*number of elements in stack*/
+
+	if (*head == NULL)
 	{
-		h = h->next;
-		len++;
-	}
-	if (len < 2)
-	{
-		fprintf(stderr, "L%d: can't mod, stack too short\n", counter);
-		fclose(bus.file);
-		free(bus.content);
-		free_stack(*head);
+		fprintf(stderr, "L%u: can't mod, stack too short\n", line_number);
+		free_stack_t(*head);
+
 		exit(EXIT_FAILURE);
 	}
-	h = *head;
-	if (h->n == 0)
+
+	while (current->next != NULL)
 	{
-		fprintf(stderr, "L%d: division by zero\n", counter);
-		fclose(bus.file);
-		free(bus.content);
-		free_stack(*head);
+		current = current->next;
+		nnodes++;
+	}
+
+	if (nnodes + 1 <= 2)
+	{
+		fprintf(stderr, "L%d: can't mod, stack too short\n", line_number);
+		free_stack_t(*head);
+
 		exit(EXIT_FAILURE);
 	}
-	aux = h->next->n % h->n;
-	h->next->n = aux;
-	*head = h->next;
-	free(h);
+
+	current = *head; /*current equals to head to make module*/
+
+	if (current->n == 0)
+	{
+		fprintf(stderr, "L%d: division by zero\n", line_number);
+		exit(EXIT_FAILURE);
+	}
+
+	current->next->n = current->next->n % current->n; /*do the mod*/
+
+	*head = current->next;
+	free(current);
+	current->prev = NULL;
 }
