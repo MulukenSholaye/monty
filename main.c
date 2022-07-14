@@ -1,114 +1,103 @@
 #include "monty.h"
 
-char stack_queue = 's';
+global_t vglo;
+
+/**
+ * free_vglo - frees the global variables
+ *
+ * Return: no return
+ */
+void free_vglo(void)
+{
+	free_dlistint(vglo.head);
+	free(vglo.buffer);
+	fclose(vglo.fd);
+}
+
+/**
+ * start_vglo - initializes the global variables
+ *
+ * @fd: file descriptor
+ * Return: no return
+ */
+void start_vglo(FILE *fd)
+{
+	vglo.lifo = 1;
+	vglo.cont = 1;
+	vglo.arg = NULL;
+	vglo.head = NULL;
+	vglo.fd = fd;
+	vglo.buffer = NULL;
+}
+
+/**
+ * check_input - checks if the file exists and if the file can
+ * be opened
+ *
+ * @argc: argument count
+ * @argv: argument vector
+ * Return: file struct
+ */
+FILE *check_input(int argc, char *argv[])
+{
+	FILE *fd;
+
+	if (argc == 1 || argc > 2)
+	{
+		dprintf(2, "USAGE: monty file\n");
+		exit(EXIT_FAILURE);
+	}
+
+	fd = fopen(argv[1], "r");
+
+	if (fd == NULL)
+	{
+		dprintf(2, "Error: Can't open file %s\n", argv[1]);
+		exit(EXIT_FAILURE);
+	}
+
+	return (fd);
+}
 
 /**
  * main - Entry point
- * @argc: number of arguments passed as parameter to main program.
- * @argv: array of strings with the parameters passed to main program
  *
- * Return: EXIT_SUCCESS on success, EXIT_FAILURE on any failure.
+ * @argc: argument count
+ * @argv: argument vector
+ * Return: 0 on success
  */
 int main(int argc, char *argv[])
 {
-	FILE *stream = NULL;
-	size_t len = 0;
-	unsigned int line_number = 1;
-	char *line = NULL;
-	char *code = NULL;
-	stack_t *stack = NULL;
+	void (*f)(stack_t **stack, unsigned int line_number);
+	FILE *fd;
+	size_t size = 256;
+	ssize_t nlines = 0;
+	char *lines[2] = {NULL, NULL};
 
-	if (argc != 2)
+	fd = check_input(argc, argv);
+	start_vglo(fd);
+	nlines = getline(&vglo.buffer, &size, fd);
+	while (nlines != -1)
 	{
-		dprintf(STDERR_FILENO, "USAGE: monty file\n");
-		exit(EXIT_FAILURE);
-	}
-
-	stream = fopen(argv[1], "r");
-	if (stream == NULL)
-	{
-		dprintf(STDERR_FILENO, "Error: Can't open file %s\n", argv[1]);
-		exit(EXIT_FAILURE);
-	}
-
-	while (getline(&line, &len, stream) != -1)
-	{
-		code = strtok(line, " \t\r\n\v\f");
-		if (code != NULL && code[0] != '#')
-			get_opcode(&stack, line_number, code);
-		line_number++;
-	}
-
-	free_stack_t(stack);
-	stack = NULL;
-	free(line);
-	fclose(stream);
-	exit(EXIT_SUCCESS);
-}
-
-/**
- * get_opcode - reads opcode and verifies if is valid.
- * @stack: double pointer to header (top) of the stack.
- * @line_number: counter for line number of the file.
- * @code: opcode to excecute.
- *
- * Return: void.
- */
-void get_opcode(stack_t **stack, unsigned int line_number, char *code)
-{
-	int i = 0;
-	instruction_t opcode_func[] = {
-		{"add", _add},
-		{"div", _div},
-		{"mod", _mod},
-		{"mul", _mul},
-		{"nop", _nop},
-		{"pall", _pall},
-		{"pint", _pint},
-		{"pop", _pop},
-		{"push", _push},
-		{"sub", _sub},
-		{"swap", _swap},
-		{"pchar", _pchar},
-		{"pstr", _pstr},
-		{"rotr", _rotr},
-		{"rotl", _rotl},
-		{"stack", _stack},
-		{"queue", _queue},
-		{NULL, NULL}
-	};
-
-	while (opcode_func[i].opcode)
-	{
-		if (strcmp(opcode_func[i].opcode, code) == 0)
+		lines[0] = _strtoky(vglo.buffer, " \t\n");
+		if (lines[0] && lines[0][0] != '#')
 		{
-			opcode_func[i].f(stack, line_number);
-			return;
+			f = get_opcodes(lines[0]);
+			if (!f)
+			{
+				dprintf(2, "L%u: ", vglo.cont);
+				dprintf(2, "unknown instruction %s\n", lines[0]);
+				free_vglo();
+				exit(EXIT_FAILURE);
+			}
+			vglo.arg = _strtoky(NULL, " \t\n");
+			f(&vglo.head, vglo.cont);
 		}
-		i++;
+		nlines = getline(&vglo.buffer, &size, fd);
+		vglo.cont++;
 	}
-	dprintf(STDERR_FILENO, "L%u: unknown instruction %s\n", line_number, code);
-	free_stack_t(*stack);
-	/**
-	 * close_file
-	 */
-	exit(EXIT_FAILURE);
-}
 
-/**
- * free_stack_t - function that free a list of type dlistint_t
- * @head: pointer to a list type stack_t
- *
- * Return: void.
- */
-void free_stack_t(stack_t *head)
-{
-	stack_t *temp;
+	free_vglo();
 
-	while (head != NULL)
-	{
-		temp = head->next;
-		free(head);
-		head = temp;
-	}
+	return (0);
 }
